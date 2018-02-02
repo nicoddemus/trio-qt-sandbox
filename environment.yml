@@ -1,0 +1,5 @@
+name: trio-qt
+dependencies:
+  - python =3.6
+  - trio
+  - pyqt
