@@ -1,4 +1,6 @@
-name: trio-qt
+name: trio-qt-sandbox
+channels:
+  - conda-forge
 dependencies:
   - python =3.6
   - trio
