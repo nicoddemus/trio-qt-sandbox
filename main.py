@@ -13,6 +13,25 @@ async def loop(app, event):
             return
 
 
+_nursery = None
+
+
+def get_nursery():
+    return _nursery
+
+
+def async_bind(fn):
+    def wrapper():
+        get_nursery().start_soon(fn)
+
+
+    return wrapper
+
+
+async def say_hello():
+    print('Hello')
+
+
 async def main():
     app = QApplication([])
 
@@ -23,30 +42,22 @@ async def main():
     layout.addWidget(hello)
     layout.addWidget(exit)
     widget.show()
-    if 0:
-        def say_hello():
-            print('Hello')
-        hello.clicked.connect(say_hello)
-        app.exec_()
 
     event = trio.Event()
+
 
     def on_exit():
         print('on_exit')
         event.set()
 
+
+    hello.clicked.connect(async_bind(say_hello))
     exit.clicked.connect(on_exit)
 
-    async def say_hello():
-        print('Hello')
-
     async with trio.open_nursery() as nursery:
+        global _nursery
+        _nursery = nursery
         nursery.start_soon(loop, app, event)
-
-        def wrapper():
-            nursery.start_soon(say_hello)
-
-        hello.clicked.connect(wrapper)
 
 
 if __name__ == '__main__':
